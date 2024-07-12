@@ -10,30 +10,6 @@ import threading
 import cv2
 import time
 
-import torch
-
-from depth_anything_v2.dpt import DepthAnythingV2
-
-DEVICE = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
-
-model_configs = {
-    'vits': {'encoder': 'vits', 'features': 64, 'out_channels': [48, 96, 192, 384]},
-    'vitb': {'encoder': 'vitb', 'features': 128, 'out_channels': [96, 192, 384, 768]},
-    'vitl': {'encoder': 'vitl', 'features': 256, 'out_channels': [256, 512, 1024, 1024]},
-    'vitg': {'encoder': 'vitg', 'features': 384, 'out_channels': [1536, 1536, 1536, 1536]}
-}
-
-encoder = 'vits' # or 'vits', 'vitb', 'vitg'
-
-model = DepthAnythingV2(**model_configs[encoder])
-model.load_state_dict(torch.load(f'checkpoints/depth_anything_v2_{encoder}.pth', map_location='cpu'))
-model = model.to(DEVICE).eval()
-
-
-
-
-
-
 isAlive = False
 
 class UserVision:
@@ -52,10 +28,8 @@ class UserVision:
 
     def my_imshow(self, args):
         img = self.vision.get_latest_valid_picture()
-        depth = model.infer_image(img) # HxW raw depth map in numpy
         if (img is not None):
             cv2.imshow('Original', img)
-            cv2.imshow('Stream_Bebop2', depth)
             cv2.waitKey(1)
 
 # make my bebop object
